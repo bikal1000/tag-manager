@@ -24,7 +24,7 @@ A bash script for managing semantic versioning tags in Git repositories with pac
 Run this command on terminal.
 
 ```shell
-sudo curl https://raw.githubusercontent.com/bikal1000/tag-master/main/tag-manager -o /usr/local/bin/tag-master && sudo chmod +x /usr/local/bin/tag-master
+sudo curl https://raw.githubusercontent.com/bikal1000/tag-master/main/tag-master -o /usr/local/bin/tag-master && sudo chmod +x /usr/local/bin/tag-master
 ```
 ## Usage
 
