@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Author: Bikal Shrestha
+# Version: 1.0.0
+# Description: A bash script for managing semantic versioning tags in Git repositories with package.json support.
+# Date: 2024-12-21
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
