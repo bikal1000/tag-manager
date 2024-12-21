@@ -83,17 +83,20 @@ preview_version() {
 # Function to create a new tag and update package.json
 create_tag() {
     local tag_type=$1
+    local skip_confirm=${2:-false}  # Optional parameter to skip confirmation
     local current_version=$(get_current_version)
     local new_version=$(preview_version "$tag_type")
     
     echo -e "${BLUE}Current version: ${GREEN}$current_version${NC}"
     echo -e "${BLUE}New version will be: ${GREEN}$new_version${NC}"
     
-    read -p "Do you want to proceed? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo -e "${RED}Operation cancelled${NC}"
-        return 1
+    if [ "$skip_confirm" != "true" ]; then
+        read -p "Do you want to proceed? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${RED}Operation cancelled${NC}"
+            return 1
+        fi
     fi
     
     # Update package.json
@@ -113,11 +116,8 @@ create_tag() {
     echo -e "${GREEN}✨ Version v$new_version has been created locally.${NC}"
     echo -e "${BLUE}To publish this version:${NC}"
     echo -e "${GREEN}1. Review your changes${NC}"
-    echo -e "${GREEN}3. Run: git push origin v$new_version${NC}"
     echo -e "${GREEN}2. Run: git push origin master${NC}"
-    
-    # Exit the script after successful completion
-    exit 0
+    echo -e "${GREEN}3. Run: git push origin v$new_version${NC}"
 }
 
 # Function to show version history
@@ -165,23 +165,45 @@ handle_selection() {
     esac
 }
 
-# Handle command line arguments if provided
-if [ $# -eq 1 ]; then
-    case $1 in
-        "major"|"minor"|"patch"|"hotfix")
-            create_tag "$1"
-            exit 0
+# Function to handle command line arguments
+handle_arguments() {
+    case "$1" in
+        --major)
+            create_tag "major" true
             ;;
-        "--help"|"-h")
-            echo "Usage: $0 [major|minor|patch|hotfix]"
+        --minor)
+            create_tag "minor" true
+            ;;
+        --patch)
+            create_tag "patch" true
+            ;;
+        --hotfix)
+            create_tag "hotfix" true
+            ;;
+        --history)
+            show_version_history
+            ;;
+        --help|-h)
+            echo "Usage: $0 [--major|--minor|--patch|--hotfix|--history|--help]"
+            echo ""
+            echo "Options:"
+            echo "  --major    Bump major version (X.0.0)"
+            echo "  --minor    Bump minor version (x.X.0)"
+            echo "  --patch    Bump patch version (x.x.X)"
+            echo "  --hotfix   Bump hotfix version (x.x.x.X)"
+            echo "  --history  View version history"
+            echo "  --help     Show this help message"
+            echo ""
             echo "If no argument is provided, interactive menu will be shown."
             exit 0
             ;;
+        *)
+            echo -e "${RED}Invalid argument: $1${NC}"
+            echo "Use --help to see available options"
+            exit 1
+            ;;
     esac
-fi
-
-# Main script
-clear  # Clear the screen for better presentation
+}
 
 # Check if current directory is a git repository
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
@@ -189,10 +211,18 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     exit 1
 fi
 
-while true; do
-    show_menu
-    handle_selection
-    echo ""
-    read -p "Press Enter to continue..."
-    clear
-done
+# Main execution
+if [ $# -eq 0 ]; then
+    # Interactive mode
+    clear  # Clear the screen for better presentation
+    while true; do
+        show_menu
+        handle_selection
+        echo ""
+        read -p "Press Enter to continue..."
+        clear
+    done
+else
+    # Command line argument mode
+    handle_arguments "$1"
+fi
