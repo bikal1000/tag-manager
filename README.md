@@ -1,6 +1,6 @@
 # Tag Manager
 
-A bash script for managing semantic versioning tags in Git repositories with package.json support. This tool helps automate version bumping, git tagging, and package.json updates following semantic versioning principles.
+A Bash script designed to manage semantic versioning tags in Git repositories, complete with package.json support. This tool automates version increments, Git tagging, and updates to package.json, adhering to semantic versioning standards.
 
 ## Features
 
