@@ -19,6 +19,14 @@ validate_version() {
     fi
 }
 
+# Function to check for unstaged changes
+check_unstaged_changes() {
+    if ! git diff-index --quiet HEAD --; then
+        echo -e "${RED}Error: You have unstaged changes. Please commit or stash them first.${NC}"
+        exit 1
+    fi
+}
+
 # Function to get current version from package.json
 get_current_version() {
     if [ -f "package.json" ]; then
@@ -34,7 +42,7 @@ get_current_version() {
 update_package_json() {
     local new_version=$1
     if [ -f "package.json" ]; then
-        # Create a temporary file
+        # Create a temporary file for package.json
         tmp_file=$(mktemp)
         # Update version in package.json while preserving formatting
         node -e "
@@ -46,6 +54,19 @@ update_package_json() {
         # Replace original file with updated version
         mv "$tmp_file" package.json
         echo -e "${GREEN}Updated package.json version to $new_version${NC}"
+
+        # Update package-lock.json if it exists (silently)
+        if [ -f "package-lock.json" ]; then
+            tmp_lock_file=$(mktemp)
+            node -e "
+                const fs = require('fs');
+                const packageLock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+                packageLock.version = '$new_version';
+                packageLock.packages[''].version = '$new_version';
+                fs.writeFileSync('$tmp_lock_file', JSON.stringify(packageLock, null, 2) + '\n');
+            "
+            mv "$tmp_lock_file" package-lock.json
+        fi
     else
         echo -e "${RED}Error: package.json not found${NC}"
         exit 1
@@ -84,6 +105,10 @@ preview_version() {
 create_tag() {
     local tag_type=$1
     local skip_confirm=${2:-false}  # Optional parameter to skip confirmation
+    
+    # Check for unstaged changes
+    check_unstaged_changes
+    
     local current_version=$(get_current_version)
     local new_version=$(preview_version "$tag_type")
     
@@ -99,14 +124,17 @@ create_tag() {
         fi
     fi
     
-    # Update package.json
+    # Update package.json and package-lock.json
     update_package_json "$new_version"
     
     # Create commit message
     local commit_message="v$new_version"
     
-    # Commit package.json changes
+    # Commit package.json and package-lock.json changes
     git add package.json
+    if [ -f "package-lock.json" ]; then
+        git add package-lock.json
+    fi
     git commit -m "$commit_message"
     
     # Create git tag
