@@ -9,6 +9,7 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
 # Function to validate semantic version format
@@ -38,7 +39,7 @@ get_current_version() {
     fi
 }
 
-# Function to update version in package.json
+# Function to update version in package.json and package-lock.json
 update_package_json() {
     local new_version=$1
     if [ -f "package.json" ]; then
@@ -70,6 +71,104 @@ update_package_json() {
     else
         echo -e "${RED}Error: package.json not found${NC}"
         exit 1
+    fi
+}
+
+# Function to parse commits since last tag
+parse_commits() {
+    # Get the last tag
+    local last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+    
+    # Get all commits since last tag
+    git log --pretty=format:"%s" "$last_tag..HEAD" |
+    while IFS= read -r line; do
+        if [[ $line =~ ^(Add|Change|Deprecate|Remove|Fix)\([a-zA-Z0-9_-]+\): ]]; then
+            echo "$line"
+        fi
+    done
+}
+
+# Function to generate changelog content
+generate_changelog_content() {
+    local new_version=$1
+    local date=$(date +%Y-%m-%d)
+    
+    echo "## [$new_version] - $date"
+    echo
+    
+    # Initialize category arrays
+    declare -A categories=(
+        ["Add"]=""
+        ["Change"]=""
+        ["Deprecate"]=""
+        ["Remove"]=""
+        ["Fix"]=""
+    )
+    
+    # Store commits in array
+    mapfile -t commits < <(parse_commits)
+    
+    # Categorize each commit
+    for commit in "${commits[@]}"; do
+        if [[ $commit =~ ^Add ]]; then
+            categories["Add"]+="- ${commit}\n"
+        elif [[ $commit =~ ^Change ]]; then
+            categories["Change"]+="- ${commit}\n"
+        elif [[ $commit =~ ^Deprecate ]]; then
+            categories["Deprecate"]+="- ${commit}\n"
+        elif [[ $commit =~ ^Remove ]]; then
+            categories["Remove"]+="- ${commit}\n"
+        elif [[ $commit =~ ^Fix ]]; then
+            categories["Fix"]+="- ${commit}\n"
+        fi
+    done
+    
+    # Output categorized changes
+    for category in "Add" "Change" "Deprecate" "Remove" "Fix"; do
+        if [ -n "${categories[$category]}" ]; then
+            echo "### $category"
+            echo -e "${categories[$category]}"
+            echo
+        fi
+    done
+}
+
+# Function to update CHANGELOG.md
+update_changelog() {
+    local new_version=$1
+    local temp_file=$(mktemp)
+    local changelog_file="CHANGELOG.md"
+    
+    # Create changelog if it doesn't exist
+    if [ ! -f "$changelog_file" ]; then
+        echo "# Changelog" > "$changelog_file"
+        echo "" >> "$changelog_file"
+        echo "All notable changes to this project will be documented in this file." >> "$changelog_file"
+        echo "" >> "$changelog_file"
+    fi
+    
+    # Generate new changelog content
+    local new_content=$(generate_changelog_content "$new_version")
+    
+    if [ -n "$new_content" ]; then
+        # Preserve header (first 4 lines)
+        head -n 4 "$changelog_file" > "$temp_file"
+        echo "" >> "$temp_file"
+        
+        # Add new changes
+        echo "$new_content" >> "$temp_file"
+        echo "" >> "$temp_file"
+        
+        # Add previous changes (skip header)
+        tail -n +5 "$changelog_file" >> "$temp_file"
+        
+        # Replace original file
+        mv "$temp_file" "$changelog_file"
+        echo -e "${GREEN}Updated CHANGELOG.md${NC}"
+        return 0
+    else
+        echo -e "${YELLOW}No matching commits found to update CHANGELOG.md${NC}"
+        return 1
     fi
 }
 
@@ -120,7 +219,7 @@ create_tag() {
     
     local current_version=$(get_current_version)
     local new_version=$(preview_version "$tag_type")
-
+    
     # Check if tag already exists
     check_tag_exists "$new_version"
     
@@ -139,13 +238,19 @@ create_tag() {
     # Update package.json and package-lock.json
     update_package_json "$new_version"
     
+    # Update changelog
+    update_changelog "$new_version"
+    
     # Create commit message
     local commit_message="v$new_version"
     
-    # Commit package.json and package-lock.json changes
+    # Commit all changes
     git add package.json
     if [ -f "package-lock.json" ]; then
         git add package-lock.json
+    fi
+    if [ -f "CHANGELOG.md" ]; then
+        git add CHANGELOG.md
     fi
     git commit -m "$commit_message"
     
