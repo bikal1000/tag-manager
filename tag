@@ -101,6 +101,15 @@ preview_version() {
     esac
 }
 
+# Function to check if tag exists
+check_tag_exists() {
+    local new_version=$1
+    if git rev-parse "v$new_version" >/dev/null 2>&1; then
+        echo -e "${RED}Error: Tag v$new_version already exists${NC}"
+        exit 1
+    fi
+}
+
 # Function to create a new tag and update package.json
 create_tag() {
     local tag_type=$1
@@ -111,6 +120,9 @@ create_tag() {
     
     local current_version=$(get_current_version)
     local new_version=$(preview_version "$tag_type")
+
+    # Check if tag already exists
+    check_tag_exists "$new_version"
     
     echo -e "${BLUE}Current version: ${GREEN}$current_version${NC}"
     echo -e "${BLUE}New version will be: ${GREEN}$new_version${NC}"
