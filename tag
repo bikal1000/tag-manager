@@ -62,7 +62,13 @@ update_package_json() {
                 const fs = require('fs');
                 const packageLock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
                 packageLock.version = '$new_version';
-                packageLock.packages[''].version = '$new_version';
+                
+                if (packageLock.packages) {
+                    packageLock.packages[''].version = '$new_version';
+                } else if (packageLock.dependencies) {
+                    packageLock.version = '$new_version';
+                }
+                
                 fs.writeFileSync('$tmp_lock_file', JSON.stringify(packageLock, null, 2) + '\n');
             "
             mv "$tmp_lock_file" package-lock.json
