@@ -4,24 +4,24 @@ A bash script for managing semantic versioning tags in Git repositories with pac
 
 ## Features
 
--   Interactive menu-driven interface
--   Command-line argument support
--   Semantic versioning support (major.minor.patch.hotfix)
--   Automatic package.json version updating
--   Version history viewing
--   Git tag creation and management
--   Input validation
--   Colored terminal output for better visibility
+- **Interactive menu-driven interface**
+- **Command-line argument support with optional project prefix** (e.g., `tag --minor xp` will create a tag `xp-v1.0.0`)
+- **Semantic versioning support** (major.minor.patch/hotfix)
+- **Automatic update of package.json and package-lock.json versions**
+- **Version history viewing**
+- **Git tag creation and management**
+- **Input validation**
+- **Colored terminal output for better visibility**
 
 ## Prerequisites
 
--   Git
--   Node.js (for package.json manipulation)
--   Bash shell
+- Git
+- Node.js (for package.json manipulation)
+- Bash shell
 
 ## Installation
 
-Run this command on terminal.
+Run the following command in your terminal:
 
 ```shell
 sudo curl https://raw.githubusercontent.com/bikal1000/tag-manager/main/tag -o /usr/local/bin/tag && sudo chmod +x /usr/local/bin/tag
@@ -39,25 +39,32 @@ Simply run the command without any arguments:
 tag
 ```
 
-This will launch an interactive menu where you can:
-
-1. View current version
+This launches an interactive menu where you can:
+1. View the current version
 2. View version history
 3. Create a new tag (major, minor, patch, or hotfix)
-4. Update package.json version
+4. Update package.json and package-lock.json
 
 ### Command Line Arguments
 
 For direct version bumping, use one of these arguments:
 
 ```shell
-tag --major    # Bump major version (X.0.0)
-tag --minor    # Bump minor version (x.X.0)
-tag --patch    # Bump patch version (x.x.X)
-tag --hotfix   # Bump hotfix version (x.x.x.X)
-tag --history  # View version history
+tag --major            # Bump major version (X.0.0)
+tag --minor            # Bump minor version (x.X.0)
+tag --patch            # Bump patch version (x.x.X)
+tag --hotfix           # Bump hotfix version (x.x.x.X)
+tag --history          # View version history
+```
+
+#### Optional Project Prefix
+
+You may also supply an optional project prefix as the last argument. This prefix is added before the version tag. For example:
+
+```shell
+tag --minor xp       # Creates a tag named "xp-v1.0.0"
 ```
 
 ## License
 
-This script is available under the MIT License. See the LICENSE file for more information.
+This script is available under the MIT License. See the [LICENSE](LICENSE) file for more information.
