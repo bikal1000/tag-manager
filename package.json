@@ -1,0 +1,32 @@
+{
+    "name": "tag-manager-cli",
+    "version": "2.0.0",
+    "description": "A cross-platform CLI tool for managing semantic versioning tags in Git repositories with package.json support.",
+    "type": "module",
+    "bin": {
+        "tag": "./bin/tag.js"
+    },
+    "keywords": [
+        "git",
+        "tag",
+        "semantic-versioning",
+        "semver",
+        "version",
+        "bump",
+        "cli"
+    ],
+    "author": "bikal1000",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bikal1000/tag-manager.git"
+    },
+    "engines": {
+        "node": ">=16.0.0"
+    },
+    "dependencies": {
+        "chalk": "^5.3.0",
+        "commander": "^12.1.0",
+        "inquirer": "^9.3.0"
+    }
+}

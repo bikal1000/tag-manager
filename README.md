@@ -1,70 +1,121 @@
-# Tag Manager
+# 🏷️ Tag Manager
 
-A bash script for managing semantic versioning tags in Git repositories with package.json support. This tool helps automate version bumping, git tagging, and package.json updates following semantic versioning principles.
+A **cross-platform** CLI tool for managing semantic versioning tags in Git repositories with `package.json` support.
+
+Works on **Windows**, **macOS**, and **Linux** — anywhere Node.js runs.
 
 ## Features
 
-- **Interactive menu-driven interface**
-- **Command-line argument support with optional project prefix** (e.g., `tag --minor xp` will create a tag `xp-v1.0.0`)
-- **Semantic versioning support** (major.minor.patch/hotfix)
-- **Automatic update of package.json and package-lock.json versions**
-- **Version history viewing**
-- **Git tag creation and management**
-- **Input validation**
-- **Colored terminal output for better visibility**
+- 🎯 **Interactive mode** — menu-driven interface for quick tagging
+- ⚡ **Command-line mode** — direct version bumping via subcommands
+- 📦 **Semantic versioning** — `major`, `minor`, `patch`, and `hotfix` bumps
+- 🏗️ **Project prefix** — optional prefix for monorepo/multi-project tags (e.g., `xp-v1.2.0`)
+- 📝 **Auto-updates** `package.json` and `package-lock.json`
+- 🔖 **Git tag creation** — annotated tags with automatic commit
+- 📜 **Version history** — view recent tags at a glance
+- ✅ **Safety checks** — validates clean working tree and prevents duplicate tags
+- 🎨 **Colored output** — clear, readable terminal output
 
 ## Prerequisites
 
-- Git
-- Node.js (for package.json manipulation)
-- Bash shell
+- [Node.js](https://nodejs.org/) >= 16
+- [Git](https://git-scm.com/)
 
 ## Installation
 
-Run the following command in your terminal:
+### Global install (recommended)
 
-```shell
-sudo curl https://raw.githubusercontent.com/bikal1000/tag-manager/main/tag -o /usr/local/bin/tag && sudo chmod +x /usr/local/bin/tag
+```bash
+npm install -g tag-manager-cli
+```
+
+### From source
+
+```bash
+git clone https://github.com/bikal1000/tag-manager.git
+cd tag-manager
+npm install
+npm link
 ```
 
 ## Usage
 
-You can run the script in two ways:
-
 ### Interactive Mode
 
-Simply run the command without any arguments:
+Run without any arguments to launch the interactive menu:
 
-```shell
+```bash
 tag
 ```
 
-This launches an interactive menu where you can:
-1. View the current version
-2. View version history
-3. Create a new tag (major, minor, patch, or hotfix)
-4. Update package.json and package-lock.json
+You'll see a menu like:
 
-### Command Line Arguments
+```
+──────────────────────────────────────────────────
+  🏷️  Tag Manager
+──────────────────────────────────────────────────
 
-For direct version bumping, use one of these arguments:
+Current version: 1.2.3
 
-```shell
-tag --major            # Bump major version (X.0.0)
-tag --minor            # Bump minor version (x.X.0)
-tag --patch            # Bump patch version (x.x.X)
-tag --hotfix           # Bump hotfix version (x.x.x.X)
-tag --history          # View version history
+? Select an action:
+  ❯ Major  (X.0.0)     — Breaking changes
+    Minor  (x.X.0)     — New features
+    Patch  (x.x.X)     — Bug fixes
+    Hotfix (x.x.x.X)   — Quick fixes
+    ──────────────
+    View version history
+    Exit
 ```
 
-#### Optional Project Prefix
+### Command-Line Mode
 
-You may also supply an optional project prefix as the last argument. This prefix is added before the version tag. For example:
+For direct version bumping, use subcommands:
 
-```shell
-tag --minor xp       # Creates a tag named "xp-v1.0.0"
+```bash
+tag major           # Bump major version (X.0.0)
+tag minor           # Bump minor version (x.X.0)
+tag patch           # Bump patch version (x.x.X)
+tag hotfix          # Bump hotfix version (x.x.x.X)
+tag history         # View recent version history
 ```
+
+### Project Prefix
+
+Add an optional project prefix to scope tags for monorepos:
+
+```bash
+tag minor xp        # Creates tag: xp-v1.1.0
+tag patch api       # Creates tag: api-v1.0.1
+```
+
+### Help
+
+```bash
+tag --help
+tag minor --help
+```
+
+## How It Works
+
+1. Reads the current version from `package.json`
+2. Calculates the next version based on bump type
+3. Updates `package.json` (and `package-lock.json` if present)
+4. Commits the version change
+5. Creates an annotated git tag
+6. Prints push instructions
+
+## Migrating from v1 (Bash)
+
+If you were using the original bash script, the CLI arguments have changed slightly:
+
+| Bash (v1)         | Node.js (v2)    |
+| ----------------- | --------------- |
+| `tag --major`     | `tag major`     |
+| `tag --minor`     | `tag minor`     |
+| `tag --minor xp`  | `tag minor xp`  |
+| `tag --history`   | `tag history`   |
+| `tag` (no args)   | `tag` (no args) |
 
 ## License
 
-This script is available under the MIT License. See the [LICENSE](LICENSE) file for more information.
+[MIT](LICENSE)
