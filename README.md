@@ -26,7 +26,7 @@ Works on **Windows**, **macOS**, and **Linux** — anywhere Node.js runs.
 ### Global install (recommended)
 
 ```bash
-npm install -g @bikal1000/tag-manager
+npm install -g tag-manager-cli
 ```
 
 ### From source

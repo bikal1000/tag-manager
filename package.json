@@ -1,5 +1,5 @@
 {
-    "name": "@bikal1000/tag-manager",
+    "name": "tag-manager-cli",
     "version": "2.0.0",
     "description": "A cross-platform CLI tool for managing semantic versioning tags in Git repositories with package.json support.",
     "type": "module",
