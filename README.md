@@ -21,21 +21,10 @@ Works on **Windows**, **macOS**, and **Linux** — anywhere Node.js runs.
 - [Node.js](https://nodejs.org/) >= 16
 - [Git](https://git-scm.com/)
 
-## Installation
-
-### Global install (recommended)
+### Global install
 
 ```bash
 npm install -g @bikal404/tag-manager
-```
-
-### From source
-
-```bash
-git clone https://github.com/bikal1000/tag-manager.git
-cd tag-manager
-npm install
-npm link
 ```
 
 ## Usage
