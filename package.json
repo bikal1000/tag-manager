@@ -1,10 +1,10 @@
 {
-    "name": "tag-manager-cli",
+    "name": "@bikal404/tag-manager",
     "version": "2.0.0",
     "description": "A cross-platform CLI tool for managing semantic versioning tags in Git repositories with package.json support.",
     "type": "module",
     "bin": {
-        "tag": "./bin/tag.js"
+        "tag": "bin/tag.js"
     },
     "files": [
         "bin/",
@@ -26,7 +26,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/bikal1000/tag-manager.git"
+        "url": "git+https://github.com/bikal1000/tag-manager.git"
     },
     "engines": {
         "node": ">=16.0.0"
