@@ -21,6 +21,14 @@
         "bump",
         "cli"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bikal1000/tag-manager.git"
+    },
+    "bugs": {
+        "url": "https://github.com/bikal1000/tag-manager/issues"
+    },
+    "homepage": "https://github.com/bikal1000/tag-manager#readme",
     "author": "bikal1000",
     "license": "MIT",
     "engines": {
